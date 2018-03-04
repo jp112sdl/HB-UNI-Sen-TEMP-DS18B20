@@ -28,9 +28,7 @@
 // all library classes are placed in the namespace 'as'
 using namespace as;
 
-#define INTERVAL 180
-
-#define NUM_SENSORS 3
+#define INTERVAL 10
 
 // define all device properties
 const struct DeviceInfo PROGMEM devinfo = {
@@ -127,21 +125,12 @@ class WeatherChannel : public Channel<Hal, List1, EmptyList, List4, PEERS_PER_CH
     // here we do the measurement
     void measure () {
       memset(temperatures, 0, sizeof(temperatures));
-      for (int i = 0; i < NUM_SENSORS; i++) {
+
+      for (int i = 0; i < ds18b20.sencount(); i++) {
         ds18b20.measure(i);
         temperatures[i] = ds18b20.temperature();
         DPRINT("measure(");DDEC(i);DPRINT(") = ");DDECLN(temperatures[i]);
       }
-      //Fake Werte zum Testen
-      /*temperatures[0] = 89;
-        temperatures[1] = 190;
-        temperatures[2] = 560;
-        temperatures[3] = 1200;
-        temperatures[4] = -18;
-        temperatures[5] = -200;
-        temperatures[6] = 95;
-        temperatures[7] = 326;*/
-
     }
 
     // here we calc when to send next value
