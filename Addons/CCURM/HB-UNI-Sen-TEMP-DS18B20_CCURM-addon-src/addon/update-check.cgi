@@ -1,5 +1,5 @@
 #!/bin/tclsh
-set checkURL    "https://raw.githubusercontent.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/master/Addons/CCURM/HB-UNI-Sen-TEMP-DS18B20-addon-src/addon/VERSION"
+set checkURL    "https://raw.githubusercontent.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/master/Addons/CCURM/HB-UNI-Sen-TEMP-DS18B20_CCURM-addon-src/addon/VERSION"
 set downloadURL "https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/raw/master/Addons/CCURM/HB-UNI-Sen-TEMP-DS18B20_CCURM-addon.tgz"
 
 catch {
