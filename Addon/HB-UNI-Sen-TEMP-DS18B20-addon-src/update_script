@@ -7,7 +7,7 @@ ADDON_DIR=/usr/local/addons/$ADDON_NAME
 
 if [ "$1" = "" ]; then
   echo "CCU1"
-  lcdtool "installing XML-API      "
+  lcdtool "installing hbunisentemp "
   mount -t yaffs /dev/mtdblock3 /usr/local
 elif [ "$1" = "CCU2" ]; then
   echo "CCU2"
@@ -28,12 +28,7 @@ chmod 755 ${ADDON_DIR}
 
 # Symbolic Links
 rm -rf ${WWW_DIR}
-ln -sf ${ADDON_DIR} ${WWW_DIR}
-#rm -f ${WWW_DIR}/update_check.cgi                 
-#ln -sf ${ADDON_DIR}/VERSION ${WWW_DIR}/VERSION.txt
-#ln -sf ${ADDON_DIR}/update-check.cgi ${WWW_DIR}/update-check.cgi
-#rm -f ${WWW_DIR}/addon
-#ln -sf ${ADDON_DIR} ${WWW_DIR}/addon 
+ln -sf ${ADDON_DIR} ${WWW_DIR} 
 
 # sync filesystem to make sure all changes are written to disk
 sync

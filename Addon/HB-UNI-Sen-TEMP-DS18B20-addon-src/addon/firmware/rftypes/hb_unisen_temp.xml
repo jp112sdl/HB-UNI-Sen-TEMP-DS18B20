@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <device version="2" rx_modes="CONFIG,WAKEUP,LAZY_CONFIG" cyclic_timeout="600">
   <supported_types>
-    <type name="HB-UNI-Sen-TEMP-DS18B20-I" id="HB-UNI-Sen-TEMP-DS18B20-I" updatable="true">
+    <type name="HB-UNI-Sen-TEMP-DS18B20" id="HB-UNI-Sen-TEMP-DS18B20" updatable="true">
       <parameter index="9.0" size="1.0" cond_op="GE" const_value="12" />
       <parameter index="10.0" size="2.0" const_value="0xF301" />
-    </type>
-    <type name="HB-UNI-Sen-TEMP-DS18B20-O" id="HB-UNI-Sen-TEMP-DS18B20-O" updatable="true">
-      <parameter index="9.0" size="1.0" cond_op="GE" const_value="12" />
-      <parameter index="10.0" size="2.0" const_value="0xF302" />
     </type>
   </supported_types>
   <paramset type="MASTER" id="hm_uni_sen_dev_master">
