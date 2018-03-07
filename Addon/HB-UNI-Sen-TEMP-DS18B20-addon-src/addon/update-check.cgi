@@ -1,6 +1,6 @@
 #!/bin/tclsh
-set checkURL    "https://raw.githubusercontent.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/master/Addons/HB-UNI-Sen-TEMP-DS18B20-addon-src/addon/VERSION"
-set downloadURL "https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/raw/master/Addons/HB-UNI-Sen-TEMP-DS18B20-addon.tgz"
+set checkURL    "https://raw.githubusercontent.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/master/Addon/HB-UNI-Sen-TEMP-DS18B20-addon-src/addon/VERSION"
+set downloadURL "https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/raw/master/Addon/HB-UNI-Sen-TEMP-DS18B20-addon.tgz"
 
 catch {
   set input $env(QUERY_STRING)
