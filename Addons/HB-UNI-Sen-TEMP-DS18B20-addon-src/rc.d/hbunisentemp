@@ -50,7 +50,7 @@ start
 info)
   echo "Info: <b>HB-UNI-Sen-TEMP-DS18B20 Addon</b><br>"
   echo "Info: <a href='https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20'>https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20</a>"
-  echo "Version: 1.0"
+  echo "Version: $(cat ${ADDON_DIR}/VERSION)"
   echo "Name: HB-UNI-Sen-TEMP-DS18B20"
   echo "Operations: uninstall"
   #echo "Config-Url: ${CONFIG_URL}"
