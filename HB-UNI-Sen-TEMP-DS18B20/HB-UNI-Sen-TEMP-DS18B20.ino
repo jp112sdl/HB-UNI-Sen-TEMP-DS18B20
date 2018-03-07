@@ -55,8 +55,8 @@ class Hal : public BaseHal {
       //rtc.init();
       // measure battery every 1h
       battery.init(seconds2ticks(60UL * 60), sysclock);
-      battery.low(20); // Low voltage set to 2.0V
-      battery.critical(18); // Critical voltage set to 1.8V
+      battery.low(22);
+      battery.critical(19);
     }
 
     bool runready () {
