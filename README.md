@@ -17,15 +17,19 @@
 Um die Batterielebensdauer zu erhöhen, ist es unbedingt notwendig, die grüne LED vom Arduino Pro Mini mit einem kleinen Schraubendreher oder Messer von der Platine zu entfernen!
 
 ## Code flashen
-Beide Dateien aus dem [Ordner](https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/tree/master/HB-UNI-Sen-TEMP-DS18B20) herunterladen und gemeinsam in einem Ordner speichern.
-Arduino IDE öffnen, entsprechendes Werkzeuge->Board: "Arduino Pro or Pro Mini" sowie Prozessor: (ATmega328P (3.3V 8MHz) auswählen und Port: entsprechend einstellen.
-
-Im Menü "Sketch" -> "Hochladen" auswählen.
+- Beide Dateien aus dem [Ordner](https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/tree/master/HB-UNI-Sen-TEMP-DS18B20) herunterladen und gemeinsam in einem Ordner speichern.
+- Arduino IDE öffnen
+  - Werkzeuge
+    - Board: Arduino Pro or Pro Mini
+    - Prozessor: ATmega328P (3.3V 8MHz) 
+    - Port: entsprechend FTDI Adapter
+einstellen
+- Menü "Sketch" -> "Hochladen" auswählen.
 
 ## Addon installieren
 In der CCU2 (oder RaspberryMatic) muss vor dem Anlernen noch ein Addon installiert werden.<br>
-Die .tgz kann [hier](https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/raw/master/Addon/HB-UNI-Sen-TEMP-DS18B20-addon.tgz) heruntergeladen werden.<br>
-Die Datei darf nicht entpackt werden!<br>
+Dieses kann [hier](https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/raw/master/Addon/HB-UNI-Sen-TEMP-DS18B20-addon.tgz) heruntergeladen werden.<br>
+_Hinweis: Die Datei darf nicht entpackt werden!_<br>
 Über "Einstellungen"->"Systemsteuerung"->"Zusatzsoftware" wählt man die Datei aus und klickt auf "Installieren".
 Die CCU2 startet automatisch neu.<br>
 **Achtung: Nachdem das System wieder hochgefahren ist, muss noch einmal ein Neustart erfolgen!**<br>
