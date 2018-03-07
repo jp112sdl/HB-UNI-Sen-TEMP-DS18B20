@@ -28,7 +28,8 @@
 // all library classes are placed in the namespace 'as'
 using namespace as;
 
-#define INTERVAL 60
+//how often we have to send values (in seconds)
+#define INTERVAL 180
 
 // define all device properties
 const struct DeviceInfo PROGMEM devinfo = {
