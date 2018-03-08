@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<device version="2" rx_modes="CONFIG,WAKEUP,LAZY_CONFIG" cyclic_timeout="600">
+<device version="2" rx_modes="CONFIG,WAKEUP,LAZY_CONFIG" cyclic_timeout="1200">
   <supported_types>
     <type name="HB-UNI-Sen-TEMP-DS18B20" id="HB-UNI-Sen-TEMP-DS18B20" updatable="true">
       <parameter index="9.0" size="1.0" cond_op="GE" const_value="12" />
@@ -11,24 +11,13 @@
       <logical type="boolean" default="false" />
       <physical type="integer" interface="config" list="0" index="1" size="1.0" />
     </parameter>
-    <parameter id="DEVICE_LED_MODE">
-      <logical type="option">
-        <option id="OFF" default="true" />
-        <option id="ON" />
-      </logical>
-      <physical type="integer" interface="config" list="0" index="5.6" size="0.2" />
-      <conversion type="integer_integer_map">
-        <value_map device_value="0x00" parameter_value="0" />
-        <value_map device_value="0x01" parameter_value="1" />
-      </conversion>
-    </parameter>
     <parameter id="LOW_BAT_LIMIT">
-      <logical type="float" min="1.8" max="3.3" default="3.0" unit="V" />
+      <logical type="float" min="1.9" max="3.3" default="2.2" unit="V" />
       <physical type="integer" interface="config" list="0" index="18" size="1" />
       <conversion type="float_integer_scale" factor="10" />
     </parameter>
     <parameter id="TRANSMIT_DEV_TRY_MAX">
-      <logical type="integer" min="1.0" max="10" default="6" />
+      <logical type="integer" min="1.0" max="10" default="1" />
       <physical type="integer" interface="config" list="0" index="20" size="1" />
     </parameter>
   </paramset>
@@ -74,7 +63,13 @@
       <link_roles>
         <source name="WEATHER_TH" />
       </link_roles>
-      <paramset type="MASTER" id="HB-UNI-Sen-TEMP-DS18B20_master"></paramset>
+      <paramset type="MASTER" id="HB-UNI-Sen-TEMP-DS18B20_master">
+        <parameter id="Sendeintervall">                       
+          <logical type="float" min="60" max="600" unit="s" default="180" />
+          <physical type="integer" interface="config" list="1" index="33" size="1" />
+          <conversion type="float_configtime" factors="10" value_size="0.7" />       
+        </parameter>                                            
+      </paramset> 
       <paramset type="VALUES" id="HB-UNI-Sen-TEMP-DS18B20_values">
         <parameter id="Sensor 1" operations="read,event">
           <logical type="float" min="-150.0" max="150.0" unit="°C" />
