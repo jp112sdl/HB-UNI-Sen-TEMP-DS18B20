@@ -28,8 +28,7 @@
 // all library classes are placed in the namespace 'as'
 using namespace as;
 
-//how often we have to send values (in seconds)
-#define INTERVAL 180
+byte _txMindelay = 0x3c;
 
 // define all device properties
 const struct DeviceInfo PROGMEM devinfo = {
@@ -52,18 +51,39 @@ class Hal : public BaseHal {
   public:
     void init (const HMID& id) {
       BaseHal::init(id);
-      // init real time clock - 1 tick per second
-      //rtc.init();
-      // measure battery every 1h
+
       battery.init(seconds2ticks(60UL * 60), sysclock);
       battery.low(22);
-      battery.critical(19);
+      battery.critical(18);
     }
 
     bool runready () {
       return sysclock.runready() || BaseHal::runready();
     }
 } hal;
+
+
+DEFREGISTER(UReg0, MASTERID_REGS, DREG_TRANSMITTRYMAX, DREG_BURSTRX, DREG_LOWBATLIMIT)
+class UList0 : public RegList0<UReg0> {
+  public:
+    UList0 (uint16_t addr) : RegList0<UReg0>(addr) {}
+    void defaults () {
+      clear();
+      burstRx(false);
+      transmitDevTryMax(1);
+      lowBatLimit(22);
+    }
+};
+
+DEFREGISTER(UReg1, CREG_TX_MINDELAY)
+class UList1 : public RegList1<UReg1> {
+  public:
+    UList1 (uint16_t addr) : RegList1<UReg1>(addr) {}
+    void defaults () {
+      clear();
+      minInterval(180);
+    }
+};
 
 class WeatherEventMsg : public Message {
   public:
@@ -84,43 +104,29 @@ class WeatherEventMsg : public Message {
     }
 };
 
-DEFREGISTER(WeatherRegsList0, DREG_BURSTRX)
-typedef RegList0<WeatherRegsList0> WeatherList0;
-
-
-class WeatherChannel : public Channel<Hal, List1, EmptyList, List4, PEERS_PER_CHANNEL, WeatherList0>, public Alarm {
+class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_CHANNEL, UList0>, public Alarm {
 
     WeatherEventMsg msg;
 
     Ds18b20<3>    ds18b20;
     int16_t       temperatures[8];
-    uint16_t          millis;
+    uint16_t      millis;
 
   public:
-    WeatherChannel () : Channel(), Alarm(seconds2ticks(INTERVAL)), millis(0) {}
+    WeatherChannel () : Channel(), Alarm(5), millis(0) {}
     virtual ~WeatherChannel () {}
 
     virtual void trigger (__attribute__ ((unused)) AlarmClock& clock) {
-      // wait also for the millis
-      if ( millis != 0 ) {
-        tick =  seconds2ticks(INTERVAL);
-        millis = 0; // reset millis
-        clock.add(*this); // millis with sysclock
-      }
-      else {
-        uint8_t msgcnt = device().nextcount();
-        measure();
-        msg.init(msgcnt, temperatures, device().battery().low());
-        device().sendPeerEvent(msg, *this);
+      uint8_t msgcnt = device().nextcount();
+      // reactivate for next measure
+      tick = delay();
+      sysclock.add(*this);
 
-        // reactivate for next measure
-        HMID id;
-        device().getDeviceID(id);
-        uint32_t nextsend = delay(id, msgcnt); // TIME_MEASURE_AND_SEND_IN_S*240000;
-        tick = nextsend / 1000; // seconds to wait
-        millis = nextsend % 1000; // millis to wait
-        clock.add(*this);
-      }
+      measure();
+
+      this->changed(true);
+      msg.init(msgcnt, temperatures, device().battery().low());
+      device().sendPeerEvent(msg, *this);
     }
 
     // here we do the measurement
@@ -130,25 +136,25 @@ class WeatherChannel : public Channel<Hal, List1, EmptyList, List4, PEERS_PER_CH
       for (int i = 0; i < ds18b20.sencount(); i++) {
         ds18b20.measure(i);
         temperatures[i] = ds18b20.temperature();
-        DPRINT("measure(");DDEC(i);DPRINT(") = ");DDECLN(temperatures[i]);
+        DPRINT("measure("); DDEC(i); DPRINT(") = "); DDECLN(temperatures[i]);
       }
     }
 
-    // here we calc when to send next value
-    uint32_t delay (const HMID& id, uint8_t msgcnt) {
-      uint32_t value = ((uint32_t)id) << 8 | msgcnt;
-      value = (value * 1103515245 + 12345) >> 16;
-      value = (value & 0xFF) + 480;
-      value *= 250;
-
-      DDEC(value / 1000); DPRINT("."); DDECLN(value % 1000);
-
-      return value;
+    uint32_t delay () {
+      _txMindelay = this->getList1().txMindelay();
+      DPRINT("TX Delay = ");
+      DDECLN(_txMindelay);
+      return seconds2ticks(_txMindelay);
     }
 
-    void setup(Device<Hal, WeatherList0>* dev, uint8_t number, uint16_t addr) {
+    void configChanged() {
+      DPRINTLN("Config changed 1");
+      DPRINT("Min Intervall: ");
+      DDECLN(this->getList1().txMindelay());
+    }
+
+    void setup(Device<Hal, UList0>* dev, uint8_t number, uint16_t addr) {
       Channel::setup(dev, number, addr);
-      seconds2ticks(INTERVAL);
       sysclock.add(*this);
       ds18b20.init();
     }
@@ -162,10 +168,29 @@ class WeatherChannel : public Channel<Hal, List1, EmptyList, List4, PEERS_PER_CH
     }
 };
 
-typedef MultiChannelDevice<Hal, WeatherChannel, 1, WeatherList0> WeatherType;
-WeatherType sdev(devinfo, 0x20);
 
-ConfigButton<WeatherType> cfgBtn(sdev);
+class UType : public MultiChannelDevice<Hal, WeatherChannel, 1, UList0> {
+  public:
+    typedef MultiChannelDevice<Hal, WeatherChannel, 1, UList0> TSDevice;
+    UType(const DeviceInfo& info, uint16_t addr) : TSDevice(info, addr) {}
+    virtual ~UType () {}
+
+    virtual void configChanged () {
+      TSDevice::configChanged();
+      DPRINTLN("Config Changed 0");
+      DPRINT("LOW BAT Limit: ");
+      DDECLN(this->getList0().lowBatLimit());
+      DPRINT("Max Try: ");
+      DDECLN(this->getList0().transmitDevTryMax());
+      Hal().battery.low(this->getList0().lowBatLimit());
+    }
+};
+
+
+//typedef MultiChannelDevice<Hal, WeatherChannel, 1, UList0> WeatherType;
+UType sdev(devinfo, 0x20);
+
+ConfigButton<UType> cfgBtn(sdev);
 
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
