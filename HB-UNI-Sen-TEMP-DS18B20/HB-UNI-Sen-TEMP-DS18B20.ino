@@ -28,8 +28,6 @@
 // all library classes are placed in the namespace 'as'
 using namespace as;
 
-uint8_t _txMindelay = 18; //tenth of seconds (18 = 180)
-
 // define all device properties
 const struct DeviceInfo PROGMEM devinfo = {
   {0x11, 0x12, 0x13},       	 // Device ID
@@ -81,7 +79,7 @@ class UList1 : public RegList1<UReg1> {
     UList1 (uint16_t addr) : RegList1<UReg1>(addr) {}
     void defaults () {
       clear();
-      minInterval(180);
+      eventDelaytime(18);
     }
 };
 
@@ -139,6 +137,7 @@ class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_C
     }
 
     uint32_t delay () {
+      uint8_t _txMindelay = 18; //tenth of seconds (18 = 180)
       _txMindelay = this->getList1().eventDelaytime();
       if (_txMindelay == 0) _txMindelay = 18;
       return seconds2ticks(_txMindelay * 10);
