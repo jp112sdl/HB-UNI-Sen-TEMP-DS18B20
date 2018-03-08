@@ -21,6 +21,9 @@ fi
 cp -af rc.d/$ADDON_NAME ${RC_DIR}/
 chmod +x ${RC_DIR}/$ADDON_NAME
 
+# delete old xml file
+rm -rf /firmware/rftypes/hb_unisen_temp.xml 
+
 # Addon-Verzeichnis anlegen
 mkdir -p ${ADDON_DIR}
 cp -af addon/* ${ADDON_DIR}
@@ -28,7 +31,7 @@ chmod 755 ${ADDON_DIR}
 
 # Symbolic Links
 rm -rf ${WWW_DIR}
-ln -sf ${ADDON_DIR} ${WWW_DIR} 
+ln -sf ${ADDON_DIR} ${WWW_DIR}
 
 # sync filesystem to make sure all changes are written to disk
 sync
