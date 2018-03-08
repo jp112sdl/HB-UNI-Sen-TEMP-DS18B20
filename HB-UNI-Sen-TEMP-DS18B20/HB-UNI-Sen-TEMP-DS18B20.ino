@@ -74,7 +74,7 @@ class WeatherEventMsg : public Message {
       if ( batlow == true ) {
         t1 |= 0x80; // set bat low bit
       }
-      Message::init(0x19, msgcnt, 0x70, BIDI, t1, t2); // first byte determines message length; pload[0] starts at byte 13
+      Message::init(0x19, msgcnt, 0x70, BCAST, t1, t2); // first byte determines message length; pload[0] starts at byte 13
 
       for (int i = 0; i < 14; i++) {
         pload[i] = (temps[(i / 2) + 1] >> 8) & 0x7f;
