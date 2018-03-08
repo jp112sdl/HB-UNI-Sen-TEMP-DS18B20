@@ -28,7 +28,7 @@
 // all library classes are placed in the namespace 'as'
 using namespace as;
 
-byte _txMindelay = 0x3c;
+uint8_t _txMindelay = 18; //tenth of seconds (18 = 180)
 
 // define all device properties
 const struct DeviceInfo PROGMEM devinfo = {
@@ -75,7 +75,7 @@ class UList0 : public RegList0<UReg0> {
     }
 };
 
-DEFREGISTER(UReg1, CREG_TX_MINDELAY)
+DEFREGISTER(UReg1, CREG_EVENTDELAYTIME)
 class UList1 : public RegList1<UReg1> {
   public:
     UList1 (uint16_t addr) : RegList1<UReg1>(addr) {}
@@ -88,13 +88,12 @@ class UList1 : public RegList1<UReg1> {
 class WeatherEventMsg : public Message {
   public:
     void init(uint8_t msgcnt, int16_t temps[8], bool batlow) {
-
       uint8_t t1 = (temps[0] >> 8) & 0x7f;
       uint8_t t2 = temps[0] & 0xff;
       if ( batlow == true ) {
         t1 |= 0x80; // set bat low bit
       }
-      Message::init(0x19, msgcnt, 0x70, BCAST, t1, t2); // first byte determines message length; pload[0] starts at byte 13
+      Message::init(0x19, msgcnt, 0x70, BCAST, t1, t2);
 
       for (int i = 0; i < 14; i++) {
         pload[i] = (temps[(i / 2) + 1] >> 8) & 0x7f;
@@ -129,7 +128,6 @@ class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_C
       device().sendPeerEvent(msg, *this);
     }
 
-    // here we do the measurement
     void measure () {
       memset(temperatures, 0, sizeof(temperatures));
 
@@ -141,16 +139,15 @@ class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_C
     }
 
     uint32_t delay () {
-      _txMindelay = this->getList1().txMindelay();
-      DPRINT("TX Delay = ");
-      DDECLN(_txMindelay);
-      return seconds2ticks(_txMindelay);
+      _txMindelay = this->getList1().eventDelaytime();
+      if (_txMindelay == 0) _txMindelay = 18;
+      return seconds2ticks(_txMindelay * 10);
     }
 
     void configChanged() {
-      DPRINTLN("Config changed 1");
-      DPRINT("Min Intervall: ");
-      DDECLN(this->getList1().txMindelay());
+      DPRINTLN("Config changed List1");
+      DPRINT("TX Delay = ");
+      DDECLN(this->getList1().eventDelaytime());
     }
 
     void setup(Device<Hal, UList0>* dev, uint8_t number, uint16_t addr) {
@@ -177,19 +174,16 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, 1, UList0> {
 
     virtual void configChanged () {
       TSDevice::configChanged();
-      DPRINTLN("Config Changed 0");
+      DPRINTLN("Config Changed List0");
       DPRINT("LOW BAT Limit: ");
       DDECLN(this->getList0().lowBatLimit());
-      DPRINT("Max Try: ");
+      DPRINT("Max Try Limit: ");
       DDECLN(this->getList0().transmitDevTryMax());
       Hal().battery.low(this->getList0().lowBatLimit());
     }
 };
 
-
-//typedef MultiChannelDevice<Hal, WeatherChannel, 1, UList0> WeatherType;
 UType sdev(devinfo, 0x20);
-
 ConfigButton<UType> cfgBtn(sdev);
 
 void setup () {
