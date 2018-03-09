@@ -11,7 +11,7 @@ RCD_DIR=/usr/local/etc/config/rc.d
 start() 
 {
   echo 'Starting...'
-  if [ ! -f ${ADDON_DIR}/installed ]; then
+  if [ ! -f ${ADDON_DIR}/installed ] || [ ! -f /firmware/rftypes/hb_unisen_temp.xml ]; then
     cd ${ADDON_DIR}
     ./installHBUNISENTEMP  > $LOGFILE 2> /dev/null & echo $!> $PIDFILE
   else
