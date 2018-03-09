@@ -175,17 +175,34 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, 1, UList0> {
       DPRINTLN("Config Changed List0");
       DPRINT("LOW BAT Limit: ");
       DDECLN(this->getList0().lowBatLimit());
+      DPRINT("Wake-On-Radio: ");
+      DDECLN(this->getList0().burstRx());
       Hal().battery.low(this->getList0().lowBatLimit());
     }
 };
 
 UType sdev(devinfo, 0x20);
 ConfigButton<UType> cfgBtn(sdev);
+//BurstDetector<Hal> bd(hal);
+
+void initPeerings (bool first) {
+  // create internal peerings - CCU2 needs this
+  if ( first == true ) {
+    HMID devid;
+    sdev.getDeviceID(devid);
+    for ( uint8_t i = 1; i <= sdev.channels(); ++i ) {
+      Peer ipeer(devid, i);
+      sdev.channel(i).peer(ipeer);
+    }
+  }
+}
 
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
-  sdev.init(hal);
+  bool first = sdev.init(hal);
   buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
+  initPeerings(first);
+  //bd.enable(sysclock);
   sdev.initDone();
 }
 
