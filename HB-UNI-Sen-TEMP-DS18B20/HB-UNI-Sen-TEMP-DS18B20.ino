@@ -50,7 +50,7 @@ class Hal : public BaseHal {
     void init (const HMID& id) {
       BaseHal::init(id);
 
-      battery.init(seconds2ticks(60UL * 60), sysclock);
+      battery.init(seconds2ticks(60UL * 60), sysclock); //battery measure once an hour
       battery.low(22);
       battery.critical(18);
     }
@@ -85,6 +85,8 @@ class UList1 : public RegList1<UReg1> {
 class WeatherEventMsg : public Message {
   public:
     void init(uint8_t msgcnt, int16_t temps[8], bool batlow) {
+      DPRINT("batlow = ");
+      DDECLN(batlow);
       uint8_t t1 = (temps[0] >> 8) & 0x7f;
       uint8_t t2 = temps[0] & 0xff;
       if ( batlow == true ) {
@@ -120,7 +122,6 @@ class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_C
 
       measure();
 
-      this->changed(true);
       msg.init(msgcnt, temperatures, device().battery().low());
       device().sendPeerEvent(msg, *this);
     }
@@ -163,7 +164,6 @@ class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_C
     }
 };
 
-
 class UType : public MultiChannelDevice<Hal, WeatherChannel, 1, UList0> {
   public:
     typedef MultiChannelDevice<Hal, WeatherChannel, 1, UList0> TSDevice;
@@ -177,13 +177,12 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, 1, UList0> {
       DDECLN(this->getList0().lowBatLimit());
       DPRINT("Wake-On-Radio: ");
       DDECLN(this->getList0().burstRx());
-      Hal().battery.low(this->getList0().lowBatLimit());
+      this->battery().low(this->getList0().lowBatLimit());
     }
 };
 
 UType sdev(devinfo, 0x20);
 ConfigButton<UType> cfgBtn(sdev);
-//BurstDetector<Hal> bd(hal);
 
 void initPeerings (bool first) {
   // create internal peerings - CCU2 needs this
@@ -202,7 +201,6 @@ void setup () {
   bool first = sdev.init(hal);
   buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
   initPeerings(first);
-  //bd.enable(sysclock);
   sdev.initDone();
 }
 
