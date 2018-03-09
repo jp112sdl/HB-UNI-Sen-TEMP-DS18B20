@@ -17,7 +17,6 @@ start()
   else
    echo "Nothing to do."
   fi
-
 }
 
 stop() 
