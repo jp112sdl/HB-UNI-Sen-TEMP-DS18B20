@@ -16,10 +16,6 @@
       <physical type="integer" interface="config" list="0" index="18" size="1" />
       <conversion type="float_integer_scale" factor="10" />
     </parameter>
-    <parameter id="TRANSMIT_DEV_TRY_MAX">
-      <logical type="integer" min="1.0" max="10" default="1" />
-      <physical type="integer" interface="config" list="0" index="20" size="1" />
-    </parameter>
   </paramset>
   <channels>
     <channel index="0" type="MAINTENANCE" ui_flags="internal" class="maintenance" count="1">

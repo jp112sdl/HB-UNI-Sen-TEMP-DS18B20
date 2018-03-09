@@ -61,14 +61,13 @@ class Hal : public BaseHal {
 } hal;
 
 
-DEFREGISTER(UReg0, MASTERID_REGS, DREG_TRANSMITTRYMAX, DREG_BURSTRX, DREG_LOWBATLIMIT)
+DEFREGISTER(UReg0, MASTERID_REGS, DREG_BURSTRX, DREG_LOWBATLIMIT)
 class UList0 : public RegList0<UReg0> {
   public:
     UList0 (uint16_t addr) : RegList0<UReg0>(addr) {}
     void defaults () {
       clear();
       burstRx(false);
-      transmitDevTryMax(1);
       lowBatLimit(22);
     }
 };
@@ -176,8 +175,6 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, 1, UList0> {
       DPRINTLN("Config Changed List0");
       DPRINT("LOW BAT Limit: ");
       DDECLN(this->getList0().lowBatLimit());
-      DPRINT("Max Try Limit: ");
-      DDECLN(this->getList0().transmitDevTryMax());
       Hal().battery.low(this->getList0().lowBatLimit());
     }
 };
