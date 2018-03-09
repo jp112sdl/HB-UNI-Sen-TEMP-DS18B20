@@ -47,6 +47,9 @@ Anschließend ist das Gerät im Posteingang zu finden.<br>
 Dort auf "Fertig" geklickt, wird es nun in der Geräteübersicht aufgeführt.<br>
 ![addon](Images/ccu_geraete.png)
 <br><br>
+Das Sendeintervall kann zwischen 60 und 600 Sekunden eingestellt werden.<br>
+![addon](Images/ccu_einstellungen.png)
+<br><br>
 Unter "Status und Bedienung" -> "Geräte" können die einzelnen Werte angezeigt werden.<br>
 ![addon](Images/ccu_status.png)
 
