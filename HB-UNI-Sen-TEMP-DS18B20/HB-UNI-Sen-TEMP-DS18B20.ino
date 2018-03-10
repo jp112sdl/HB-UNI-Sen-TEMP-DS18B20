@@ -14,7 +14,9 @@
 #include <Register.h>
 #include <MultiChannelDevice.h>
 
-#include "Ds18b20.h"
+#include <OneWire.h>
+#include <sensors/Ds18b20.h>
+#define MAX_SENSORS       8
 
 // Arduino Pro mini 8 Mhz
 // Arduino pin for the config button
@@ -22,6 +24,10 @@
 
 // number of available peers per channel
 #define PEERS_PER_CHANNEL 6
+
+//DS18B20 Sensors connected to pin
+OneWire oneWire(3);
+
 
 // all library classes are placed in the namespace 'as'
 using namespace as;
@@ -82,19 +88,27 @@ class UList1 : public RegList1<UReg1> {
 
 class WeatherEventMsg : public Message {
   public:
-    void init(uint8_t msgcnt, int16_t temps[8], bool batlow) {
+    void init(uint8_t msgcnt, Ds18b20 *sensors, bool batlow) {
+
       DPRINT("batlow = ");
       DDECLN(batlow);
-      uint8_t t1 = (temps[0] >> 8) & 0x7f;
-      uint8_t t2 = temps[0] & 0xff;
+      DPRINT("Temperatures: ");
+      for (int i = 0; i < MAX_SENSORS; i++) {
+        DDEC(sensors[i].temperature());
+        DPRINT(";");
+      } DPRINTLN("");
+
+
+      uint8_t t1 = (sensors[0].temperature() >> 8) & 0x7f;
+      uint8_t t2 = sensors[0].temperature() & 0xff;
       if ( batlow == true ) {
         t1 |= 0x80; // set bat low bit
       }
       Message::init(0x19, msgcnt, 0x70, BCAST, t1, t2);
 
-      for (int i = 0; i < 14; i++) {
-        pload[i] = (temps[(i / 2) + 1] >> 8) & 0x7f;
-        pload[i + 1] = temps[(i / 2) + 1] & 0xff;
+      for (int i = 0; i < ((MAX_SENSORS * 2) - 2); i++) {
+        pload[i] = (sensors[(i / 2) + 1].temperature() >> 8) & 0x7f;
+        pload[i + 1] = sensors[(i / 2) + 1].temperature() & 0xff;
         i++;
       }
     }
@@ -104,8 +118,8 @@ class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_C
 
     WeatherEventMsg msg;
 
-    Ds18b20<3>    ds18b20;
-    int16_t       temperatures[8];
+    Ds18b20       sensors[MAX_SENSORS];
+    uint8_t       sensorcount;
     uint16_t      millis;
 
   public:
@@ -118,20 +132,11 @@ class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_C
       tick = delay();
       sysclock.add(*this);
 
-      measure();
+      Ds18b20::measure(sensors, sensorcount);
 
-      msg.init(msgcnt, temperatures, device().battery().low());
+      msg.init(msgcnt, sensors, device().battery().low());
+
       device().sendPeerEvent(msg, *this);
-    }
-
-    void measure () {
-      memset(temperatures, 0, sizeof(temperatures));
-
-      for (int i = 0; i < ds18b20.sencount(); i++) {
-        ds18b20.measure(i);
-        temperatures[i] = ds18b20.temperature();
-        DPRINT("measure("); DDEC(i); DPRINT(") = "); DDECLN(temperatures[i]);
-      }
     }
 
     uint32_t delay () {
@@ -150,7 +155,8 @@ class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_C
     void setup(Device<Hal, UList0>* dev, uint8_t number, uint16_t addr) {
       Channel::setup(dev, number, addr);
       sysclock.add(*this);
-      ds18b20.init();
+      sensorcount = Ds18b20::init(oneWire, sensors, 10);
+      DPRINT("Found "); DDEC(sensorcount); DPRINTLN(" DS18B20 Sensors");
     }
 
     uint8_t status () const {
@@ -182,23 +188,10 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, 1, UList0> {
 UType sdev(devinfo, 0x20);
 ConfigButton<UType> cfgBtn(sdev);
 
-void initPeerings (bool first) {
-  // create internal peerings - CCU2 needs this
-  if ( first == true ) {
-    HMID devid;
-    sdev.getDeviceID(devid);
-    for ( uint8_t i = 1; i <= sdev.channels(); ++i ) {
-      Peer ipeer(devid, i);
-      sdev.channel(i).peer(ipeer);
-    }
-  }
-}
-
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
   bool first = sdev.init(hal);
   buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
-  initPeerings(first);
   sdev.initDone();
 }
 
