@@ -17,8 +17,9 @@
 Um die Batterielebensdauer zu erhöhen, ist es unbedingt notwendig, die grüne LED vom Arduino Pro Mini mit einem kleinen Schraubendreher oder Messer von der Platine zu entfernen!
 
 ## Code flashen
-- Beide Dateien aus dem [Ordner](https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/tree/master/HB-UNI-Sen-TEMP-DS18B20) herunterladen und gemeinsam in einem Ordner speichern.
+- [Projekt-Datei](https://raw.githubusercontent.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/master/HB-UNI-Sen-TEMP-DS18B20/HB-UNI-Sen-TEMP-DS18B20.ino) herunterladen.
 - Arduino IDE öffnen
+  - Heruntergeladene Projekt-Datei öffnen
   - Werkzeuge
     - Board: Arduino Pro or Pro Mini
     - Prozessor: ATmega328P (3.3V 8MHz) 
