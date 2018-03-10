@@ -20,8 +20,6 @@
 // Arduino pin for the config button
 #define CONFIG_BUTTON_PIN 8
 
-// #define TIME_MEASURE_AND_SEND_IN_S 15
-
 // number of available peers per channel
 #define PEERS_PER_CHANNEL 6
 
