@@ -62,7 +62,7 @@
       <paramset type="MASTER" id="HB-UNI-Sen-TEMP-DS18B20_master">
         <parameter id="Sendeintervall">                       
           <logical type="float" min="60" max="600" unit="s" default="180" />
-          <physical type="integer" interface="config" list="1" index="33" size="1" />
+          <physical type="integer" interface="config" list="1" index="123.0" size="0.7" />
           <conversion type="float_configtime" factors="10" value_size="0.7" />       
         </parameter>                                            
       </paramset> 

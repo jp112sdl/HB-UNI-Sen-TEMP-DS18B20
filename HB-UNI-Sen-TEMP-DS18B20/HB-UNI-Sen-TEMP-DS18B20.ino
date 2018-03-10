@@ -72,13 +72,13 @@ class UList0 : public RegList0<UReg0> {
     }
 };
 
-DEFREGISTER(UReg1, CREG_EVENTDELAYTIME)
+DEFREGISTER(UReg1, CREG_TX_MINDELAY)
 class UList1 : public RegList1<UReg1> {
   public:
     UList1 (uint16_t addr) : RegList1<UReg1>(addr) {}
     void defaults () {
       clear();
-      eventDelaytime(18);
+      txMindelay(18);
     }
 };
 
@@ -138,7 +138,7 @@ class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_C
 
     uint32_t delay () {
       uint8_t _txMindelay = 18; //tenth of seconds (18 = 180)
-      _txMindelay = this->getList1().eventDelaytime();
+      _txMindelay = this->getList1().txMindelay();
       if (_txMindelay == 0) _txMindelay = 18;
       return seconds2ticks(_txMindelay * 10);
     }
@@ -146,7 +146,7 @@ class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_C
     void configChanged() {
       DPRINTLN("Config changed List1");
       DPRINT("TX Delay = ");
-      DDECLN(this->getList1().eventDelaytime());
+      DDECLN(this->getList1().txMindelay());
     }
 
     void setup(Device<Hal, UList0>* dev, uint8_t number, uint16_t addr) {
