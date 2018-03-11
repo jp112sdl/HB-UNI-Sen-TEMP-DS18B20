@@ -28,7 +28,6 @@
 //DS18B20 Sensors connected to pin
 OneWire oneWire(3);
 
-
 // all library classes are placed in the namespace 'as'
 using namespace as;
 
@@ -190,7 +189,7 @@ ConfigButton<UType> cfgBtn(sdev);
 
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
-  bool first = sdev.init(hal);
+  sdev.init(hal);
   buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
   sdev.initDone();
 }
