@@ -33,12 +33,12 @@ using namespace as;
 
 // define all device properties
 const struct DeviceInfo PROGMEM devinfo = {
-  {0x11, 0x12, 0x13},       	 // Device ID
-  "UNITEMP001",           	  // Device Serial
-  {0xF3, 0x01},            	 // Device Model
-  0x10,                   	  // Firmware Version
-  as::DeviceType::THSensor, 	// Device Type
-  {0x01, 0x01}             	 // Info Bytes
+  {0x11, 0x12, 0x13},          // Device ID
+  "UNITEMP001",               // Device Serial
+  {0xF3, 0x01},              // Device Model
+  0x10,                       // Firmware Version
+  as::DeviceType::THSensor,   // Device Type
+  {0x01, 0x01}               // Info Bytes
 };
 
 /**
@@ -64,98 +64,49 @@ class Hal : public BaseHal {
 } hal;
 
 
-DEFREGISTER(UReg0, MASTERID_REGS, DREG_BURSTRX, DREG_LOWBATLIMIT)
+DEFREGISTER(UReg0, MASTERID_REGS, DREG_BURSTRX, DREG_LOWBATLIMIT, 0x21, 0x22)
 class UList0 : public RegList0<UReg0> {
   public:
     UList0 (uint16_t addr) : RegList0<UReg0>(addr) {}
+    bool Sendeintervall (uint16_t value) const {
+      return this->writeRegister(0x21, (value >> 8) & 0xff) && this->writeRegister(0x22, value & 0xff);
+    }
+    uint16_t Sendeintervall () const {
+      return (this->readRegister(0x21, 0) << 8) + this->readRegister(0x22, 0);
+    }
     void defaults () {
       clear();
       burstRx(false);
       lowBatLimit(22);
-    }
-};
-
-DEFREGISTER(UReg1, CREG_TX_MINDELAY)
-class UList1 : public RegList1<UReg1> {
-  public:
-    UList1 (uint16_t addr) : RegList1<UReg1>(addr) {}
-    void defaults () {
-      clear();
-      txMindelay(18);
+      Sendeintervall(180);
     }
 };
 
 class WeatherEventMsg : public Message {
   public:
-    void init(uint8_t msgcnt, Ds18b20 *sensors, bool batlow) {
-
-      DPRINT("batlow = ");
-      DDECLN(batlow);
-      DPRINT("Temperatures: ");
-      for (int i = 0; i < MAX_SENSORS; i++) {
-        DDEC(sensors[i].temperature());
-        DPRINT(";");
-      } DPRINTLN("");
-
-
-      uint8_t t1 = (sensors[0].temperature() >> 8) & 0x7f;
-      uint8_t t2 = sensors[0].temperature() & 0xff;
-      if ( batlow == true ) {
-        t1 |= 0x80; // set bat low bit
-      }
-      Message::init(0x19, msgcnt, 0x70, BCAST, t1, t2);
-
-      for (int i = 0; i < ((MAX_SENSORS * 2) - 2); i++) {
-        pload[i] = (sensors[(i / 2) + 1].temperature() >> 8) & 0x7f;
-        pload[i + 1] = sensors[(i / 2) + 1].temperature() & 0xff;
-        i++;
-      }
+    void init(uint8_t msgcnt, Ds18b20* sensors, bool batlow, uint8_t channelFieldOffset) {
+      Message::init(0x1a, msgcnt, 0x53, BCAST , batlow ? 0x80 : 0x00, 0x41 + channelFieldOffset);
+      pload[0] = (sensors[0 + channelFieldOffset].temperature() >> 8) & 0xff;
+      pload[1] = (sensors[0 + channelFieldOffset].temperature()) & 0xff;
+      pload[2] = 0x42 + channelFieldOffset;
+      pload[3] = (sensors[1 + channelFieldOffset].temperature() >> 8) & 0xff;
+      pload[4] = (sensors[1 + channelFieldOffset].temperature()) & 0xff;
+      pload[5] = 0x43 + channelFieldOffset;
+      pload[6] = (sensors[2 + channelFieldOffset].temperature() >> 8) & 0xff;
+      pload[7] = (sensors[2 + channelFieldOffset].temperature()) & 0xff;
+      pload[8] = 0x44 + channelFieldOffset;
+      pload[9] = (sensors[3 + channelFieldOffset].temperature() >> 8) & 0xff;
+      pload[10] = (sensors[3 + channelFieldOffset].temperature()) & 0xff;
     }
 };
 
-class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_CHANNEL, UList0>, public Alarm {
-
-    WeatherEventMsg msg;
-
-    Ds18b20       sensors[MAX_SENSORS];
-    uint8_t       sensorcount;
-    uint16_t      millis;
-
+class WeatherChannel : public Channel<Hal, List1, EmptyList, List4, PEERS_PER_CHANNEL, UList0> {
   public:
-    WeatherChannel () : Channel(), Alarm(5), millis(0) {}
+    WeatherChannel () : Channel() {}
     virtual ~WeatherChannel () {}
 
-    virtual void trigger (__attribute__ ((unused)) AlarmClock& clock) {
-      uint8_t msgcnt = device().nextcount();
-      // reactivate for next measure
-      tick = delay();
-      sysclock.add(*this);
-
-      Ds18b20::measure(sensors, sensorcount);
-
-      msg.init(msgcnt, sensors, device().battery().low());
-
-      device().sendPeerEvent(msg, *this);
-    }
-
-    uint32_t delay () {
-      uint8_t _txMindelay = 18; //tenth of seconds (18 = 180)
-      _txMindelay = this->getList1().txMindelay();
-      if (_txMindelay == 0) _txMindelay = 18;
-      return seconds2ticks(_txMindelay * 10);
-    }
-
     void configChanged() {
-      DPRINTLN("Config changed List1");
-      DPRINT("TX Delay = ");
-      DDECLN(this->getList1().txMindelay());
-    }
-
-    void setup(Device<Hal, UList0>* dev, uint8_t number, uint16_t addr) {
-      Channel::setup(dev, number, addr);
-      sysclock.add(*this);
-      sensorcount = Ds18b20::init(oneWire, sensors, 10);
-      DPRINT("Found "); DDEC(sensorcount); DPRINTLN(" DS18B20 Sensors");
+      //DPRINTLN("Config changed List1");
     }
 
     uint8_t status () const {
@@ -167,10 +118,43 @@ class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_C
     }
 };
 
-class UType : public MultiChannelDevice<Hal, WeatherChannel, 1, UList0> {
+class UType : public MultiChannelDevice<Hal, WeatherChannel, 8, UList0> {
+
+    class SensorArray : public Alarm {
+        UType& dev;
+
+      public:
+        uint8_t       sensorcount;
+        Ds18b20       sensors[MAX_SENSORS];
+        SensorArray (UType& d) : Alarm(0), dev(d) {}
+
+        virtual void trigger (__attribute__ ((unused)) AlarmClock& clock) {
+          tick = delay();
+          sysclock.add(*this);
+
+          Ds18b20::measure(sensors, sensorcount);
+
+          WeatherEventMsg& msg = (WeatherEventMsg&)dev.message();
+          //Aufteilung in 2 Messages, da sonst die max. BidCos Message Size (0x1a)? überschritten wird
+          msg.init(dev.nextcount(), sensors, dev.battery().low(), 0);
+          dev.send(msg, dev.getMasterID());
+          _delay_ms(200);
+          msg.init(dev.nextcount(), sensors, dev.battery().low(), 4);
+          dev.send(msg, dev.getMasterID());
+        }
+
+        uint32_t delay () {
+          uint16_t _txMindelay = 180;
+          _txMindelay = dev.getList0().Sendeintervall();
+          if (_txMindelay == 0) _txMindelay = 180;
+          return seconds2ticks(_txMindelay);
+        }
+
+    } sensarray;
+
   public:
-    typedef MultiChannelDevice<Hal, WeatherChannel, 1, UList0> TSDevice;
-    UType(const DeviceInfo& info, uint16_t addr) : TSDevice(info, addr) {}
+    typedef MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0> TSDevice;
+    UType(const DeviceInfo& info, uint16_t addr) : TSDevice(info, addr), sensarray(*this) {}
     virtual ~UType () {}
 
     virtual void configChanged () {
@@ -181,6 +165,15 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, 1, UList0> {
       DPRINT("Wake-On-Radio: ");
       DDECLN(this->getList0().burstRx());
       this->battery().low(this->getList0().lowBatLimit());
+      DPRINT("Sendeintervall: "); DDECLN(this->getList0().Sendeintervall());
+    }
+
+    bool init (Hal& hal) {
+      TSDevice::init(hal);
+      sensarray.sensorcount = Ds18b20::init(oneWire, sensarray.sensors, MAX_SENSORS);
+      DPRINT("Found "); DDEC(sensarray.sensorcount); DPRINTLN(" DS18B20 Sensors");
+      sensarray.set(seconds2ticks(5));
+      sysclock.add(sensarray);
     }
 };
 
@@ -201,3 +194,4 @@ void loop() {
     hal.activity.savePower<Sleep<>>(hal);
   }
 }
+

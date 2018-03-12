@@ -16,6 +16,10 @@
       <physical type="integer" interface="config" list="0" index="18" size="1" />
       <conversion type="float_integer_scale" factor="10" />
     </parameter>
+    <parameter id="Sendeintervall">                       
+      <logical type="integer" min="60" max="600" unit="s" default="180" />
+      <physical type="integer" interface="config" list="0" index="33.0" size="2" />
+    </parameter> 
   </paramset>
   <channels>
     <channel index="0" type="MAINTENANCE" ui_flags="internal" class="maintenance" count="1">
@@ -33,9 +37,11 @@
           <logical type="boolean" />
           <physical type="integer" interface="internal" value_id="CONFIG_PENDING" />
         </parameter>
-        <parameter id="LOWBAT" operations="read,event" ui_flags="service">
-          <logical type="boolean" />
-          <physical type="integer" interface="internal" value_id="LOWBAT" />
+        <parameter id="LOWBAT" operations="read,event" ui_flags="service" control="NONE">
+            <logical type="boolean" />
+            <physical type="integer" interface="command" value_id="LOWBAT">
+               <event frame="MEASURE_EV_BAT" />
+            </physical>
         </parameter>
         <parameter id="RSSI_DEVICE" operations="read,event">
           <logical type="integer" />
@@ -52,104 +58,56 @@
         <parameter id="UPDATE_PENDING" operations="read,event" ui_flags="service">
           <logical type="boolean" />
           <physical type="integer" interface="internal" value_id="UPDATE_PENDING" />
-        </parameter>
+        </parameter>                                           
       </paramset>
     </channel>
-    <channel index="1" type="WEATHER" autoregister="true">
+    <channel index="1" type="WEATHER" autoregister="true" count="8">
       <link_roles>
         <source name="WEATHER_TH" />
       </link_roles>
-      <paramset type="MASTER" id="HB-UNI-Sen-TEMP-DS18B20_master">
-        <parameter id="Sendeintervall">                       
-          <logical type="float" min="60" max="600" unit="s" default="180" />
-          <physical type="integer" interface="config" list="1" index="123.0" size="0.7" />
-          <conversion type="float_configtime" factors="10" value_size="0.7" />       
-        </parameter>                                            
-      </paramset> 
-      <paramset type="VALUES" id="HB-UNI-Sen-TEMP-DS18B20_values">
-        <parameter id="Sensor 1" operations="read,event">
-          <logical type="float" min="-150.0" max="150.0" unit="°C" />
-          <physical type="integer" interface="command" value_id="Sensor 1">
-            <event frame="WEATHER_EVENT" />
-          </physical>
-          <conversion type="float_integer_scale" factor="10.0" />
-          <description>
-            <field id="AutoconfRoles" value="WEATHER" />
-          </description>
-        </parameter>
-        <parameter id="Sensor 2" operations="read,event">
-          <logical type="float" min="-150.0" max="150.0" unit="°C" />
-          <physical type="integer" interface="command" value_id="Sensor 2">
-            <event frame="WEATHER_EVENT" />
-          </physical>
-          <conversion type="float_integer_scale" factor="10.0" />
-          <description>
-            <field id="AutoconfRoles" value="WEATHER" />
-          </description>
-        </parameter>
-        <parameter id="Sensor 3" operations="read,event">
-          <logical type="float" min="-150.0" max="150.0" unit = "°C" />
-          <physical type="integer" interface="command" value_id="Sensor 3">
-            <event frame="WEATHER_EVENT" />
-          </physical>
-          <conversion type="float_integer_scale" factor="10.0" />
-        </parameter>
-        <parameter id="Sensor 4" operations="read,event">                                           
-          <logical type="float" min="-150.0" max="150.0" unit = "°C" /> 
-          <physical type="integer" interface="command" value_id="Sensor 4">                   
-            <event frame="WEATHER_EVENT" />                                                      
-          </physical>                                                                            
-          <conversion type="float_integer_scale" factor="10.0" />                                
-        </parameter>                                                                             
-        <parameter id="Sensor 5" operations="read,event">                                                                                                                                                                                                                          
-          <logical type="float" min="-150.0" max="150.0" unit="°C" />                                                                                                                                                                                                             
-          <physical type="integer" interface="command" value_id="Sensor 5">                                                                                                                                                                                                        
-            <event frame="WEATHER_EVENT" />                                                                                                                                                                                                                                     
-          </physical>                                                                                                                                                                                                                                                           
-          <conversion type="float_integer_scale" factor="10.0" />                                                                                                                                                                                                               
-          <description>                                                                                                                                                                                                                                                         
-            <field id="AutoconfRoles" value="WEATHER" />                                                                                                                                                                                                                        
-          </description>                                                                                                                                                                                                                                                        
-        </parameter>                                                                                                                                                                                                                                                            
-        <parameter id="Sensor 6" operations="read,event">                                                                                                                                                                                                                          
-          <logical type="float" min="-150.0" max="150.0" unit="°C" />                                                                                                                                                                                                             
-          <physical type="integer" interface="command" value_id="Sensor 6">                                                                                                                                                                                                        
-            <event frame="WEATHER_EVENT" />                                                                                                                                                                                                                                     
-          </physical>                                                                                                                                                                                                                                                           
-          <conversion type="float_integer_scale" factor="10.0" />                                                                                                                                                                                                               
-          <description>                                                                                                                                                                                                                                                         
-            <field id="AutoconfRoles" value="WEATHER" />                                                                                                                                                                                                                        
-          </description>                                                                                                                                                                                                                                                        
-        </parameter>                                                                                                                                                                                                                                                            
-        <parameter id="Sensor 7" operations="read,event">                                                                                                                                                                                                                          
-          <logical type="float" min="-150.0" max="150.0" unit = "°C" />                                                                                                                                                                                                           
-          <physical type="integer" interface="command" value_id="Sensor 7">                                                                                                                                                                                                        
-            <event frame="WEATHER_EVENT" />                                                                                                                                                                                                                                     
-          </physical>                                                                                                                                                                                                                                                           
-          <conversion type="float_integer_scale" factor="10.0" />                                                                                                                                                                                                               
-        </parameter>                                                                                                                                                                                                                                                            
-        <parameter id="Sensor 8" operations="read,event">                                                                                                                                                                                                                          
-          <logical type="float" min="-150.0" max="150.0" unit = "°C" />                                                                                                                                                                                                           
-          <physical type="integer" interface="command" value_id="Sensor 8">                                                                                                                                                                                                        
-            <event frame="WEATHER_EVENT" />                                                                                                                                                                                                                                     
-          </physical>                                                                                                                                                                                                                                                           
-          <conversion type="float_integer_scale" factor="10.0" />                                                                                                                                                                                                               
-        </parameter>                                                                                                                                                                                                                                                            
-      </paramset>  
+       <paramset type="VALUES" id="HB-UNI-Sen-TEMP-DS18B20_values">
+            <parameter id="TEMPERATURE" operations="read,event">
+               <logical type="float" min="-150.0" max="150.0" unit="°C" />
+               <physical type="integer" interface="command" value_id="TEMPERATURE" no_init="true">
+                  <event frame="MEASURE_EVENT" />
+               </physical>
+               <conversion type="float_integer_scale" factor="10.0" />
+               <description>
+                  <field id="AutoconfRoles" value="WEATHER" />
+               </description>
+            </parameter>
+         </paramset>
       <paramset type="LINK" id="HB-UNI-Sen-TEMP-DS18B20_link"></paramset>
     </channel>
   </channels>
   <frames>
-    <frame id="WEATHER_EVENT" direction="from_device" event="true" fixed_channel="1" type="0x70">
-      <parameter type="integer" signed="true" index="9.0" size="1.7" param="Sensor 1" />
-      <parameter type="integer" signed="true" index="11" size="1.7" param="Sensor 2" />
-      <parameter type="integer" signed="true" index="13" size="1.7" param="Sensor 3" />
-      <parameter type="integer" signed="true" index="15" size="1.7" param="Sensor 4" />
-      <parameter type="integer" signed="true" index="17" size="1.7" param="Sensor 5" />
-      <parameter type="integer" signed="true" index="19" size="1.7" param="Sensor 6" />
-      <parameter type="integer" signed="true" index="21" size="1.7" param="Sensor 7" />
-      <parameter type="integer" signed="true" index="23" size="1.7" param="Sensor 8" />
-    </frame>
+      <frame id="MEASURE_EVENT" direction="from_device"  event="true" type="0x53" channel_field="10.0:0.6">
+         <parameter type="integer" signed="true" index="11.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="13.0:0.6">
+         <parameter type="integer" signed="true" index="14.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="16.0:0.6">
+         <parameter type="integer" signed="true" index="17.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="19.0:0.6">
+         <parameter type="integer" signed="true" index="20.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="22.0:0.6">
+         <parameter type="integer" signed="true" index="23.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="25.0:0.6">
+         <parameter type="integer" signed="true" index="26.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="28.0:0.6">
+         <parameter type="integer" signed="true" index="29.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="31.0:0.6">
+         <parameter type="integer" signed="true" index="32.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+      <frame id="MEASURE_EV_BAT" direction="from_device" event="true" type="0x53" fixed_channel="*">
+         <parameter type="integer" index="9.7" size="0.1" param="LOWBAT" />
+      </frame>
   </frames>
   <paramset_defs></paramset_defs>
 </device>
