@@ -1,6 +1,7 @@
 #!/bin/sh
 
 NAME=hbunisentemp
+DEVICE="HB-UNI-Sen-TEMP-DS18B20"
 PIDFILE=/var/run/$NAME.pid
 LOGFILE=/var/log/$NAME.log
 
@@ -13,7 +14,7 @@ start()
   echo 'Starting...'
   if [ ! -f ${ADDON_DIR}/installed ] || [ ! -f /firmware/rftypes/hb_unisen_temp.xml ]; then
     cd ${ADDON_DIR}
-    ./installHBUNISENTEMP  > $LOGFILE 2> /dev/null & echo $!> $PIDFILE
+    ./install  > $LOGFILE 2> /dev/null & echo $!> $PIDFILE
   else
    echo "Nothing to do."
   fi
@@ -32,13 +33,11 @@ stop)
 stop
 ;;
 uninstall)
-    mount -o remount,rw /
-    rm -f /firmware/rftypes/hb_unisen_temp.xml
-    rm -f /www/config/img/devices/50/hb-uni-sen-temp-ds18b20*
-    rm -f /www/config/img/devices/250/hb-uni-sen-temp-ds18b20*
+    cd ${ADDON_DIR}
+    ./uninstall  > $LOGFILE 2> /dev/null & echo $!> $PIDFILE
+    cd /
     rm -rf $ADDON_DIR
     rm -rf $WWW_DIR
-    mount -o remount,ro /
   ;;
   
 restart)
@@ -47,13 +46,13 @@ start
 ;;
 
 info)
-  echo "Info: <b>HB-UNI-Sen-TEMP-DS18B20 Addon</b><br>"
-  echo "Info: <a href='https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20'>https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20</a>"
+  echo "Info: <b>$DEVICE Addon</b><br>"
+  echo "Info: <a href='https://github.com/jp112sdl/$DEVICE'>https://github.com/jp112sdl/$DEVICE</a>"
   echo "Version: $(cat ${ADDON_DIR}/VERSION)"
-  echo "Name: HB-UNI-Sen-TEMP-DS18B20"
+  echo "Name: $DEVICE"
   echo "Operations: uninstall"
   #echo "Config-Url: ${CONFIG_URL}"
-  echo "Update: /addons/hbunisentemp/update-check.cgi"
+  echo "Update: /addons/$NAME/update-check.cgi"
     ;;
 	
 *)
