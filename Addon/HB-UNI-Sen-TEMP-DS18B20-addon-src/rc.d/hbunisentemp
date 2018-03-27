@@ -1,18 +1,21 @@
 #!/bin/sh
 
-NAME=hbunisentemp
 DEVICE="HB-UNI-Sen-TEMP-DS18B20"
-PIDFILE=/var/run/$NAME.pid
-LOGFILE=/var/log/$NAME.log
 
+NAME=hbunisentemp
 ADDON_DIR=/usr/local/addons/${NAME}
 WWW_DIR=/etc/config/addons/www/${NAME}
-RCD_DIR=/usr/local/etc/config/rc.d
+
+FIRMWARE_DIR=/firmware/rftypes
+FIRMWARE_FILE=hb_unisen_temp.xml
+
+PIDFILE=/var/run/$NAME.pid
+LOGFILE=/var/log/$NAME.log
 
 start() 
 {
   echo 'Starting...'
-  if [ ! -f ${ADDON_DIR}/installed ] || [ ! -f /firmware/rftypes/hb_unisen_temp.xml ]; then
+  if [ ! -f ${ADDON_DIR}/installed ] || [ ! -f ${FIRMWARE_DIR}/$FIRMWARE_FILE ]; then
     cd ${ADDON_DIR}
     ./install  > $LOGFILE 2> /dev/null & echo $!> $PIDFILE
   else
