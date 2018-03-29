@@ -33,8 +33,8 @@ using namespace as;
 
 // define all device properties
 const struct DeviceInfo PROGMEM devinfo = {
-  {0x11, 0x12, 0x13},          // Device ID
-  "UNITEMP001",               // Device Serial
+  {0xf3, 0x01, 0x01},          // Device ID
+  "UNITEMP001",               // Device Serial 
   {0xF3, 0x01},              // Device Model
   0x10,                       // Firmware Version
   as::DeviceType::THSensor,   // Device Type
@@ -85,6 +85,9 @@ class UList0 : public RegList0<UReg0> {
 class WeatherEventMsg : public Message {
   public:
     void init(uint8_t msgcnt, Ds18b20* sensors, bool batlow, uint8_t channelFieldOffset) {
+      for (int i = 0; i < MAX_SENSORS; i++) {
+        DPRINT("T[");DDEC(i);DPRINT("]: ");DDECLN(sensors[i].temperature());
+      }
       Message::init(0x1a, msgcnt, 0x53, BCAST , batlow ? 0x80 : 0x00, 0x41 + channelFieldOffset);
       pload[0] = (sensors[0 + channelFieldOffset].temperature() >> 8) & 0xff;
       pload[1] = (sensors[0 + channelFieldOffset].temperature()) & 0xff;
