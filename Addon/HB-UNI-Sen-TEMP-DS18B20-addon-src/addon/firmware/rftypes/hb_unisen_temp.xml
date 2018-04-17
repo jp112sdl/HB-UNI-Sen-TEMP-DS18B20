@@ -81,7 +81,7 @@
     </channel>
   </channels>
   <frames>
-      <frame id="MEASURE_EVENT" direction="from_device"  event="true" type="0x53" channel_field="10.0:0.6">
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="10.0:0.6">
          <parameter type="integer" signed="true" index="11.0" size="2.0" param="TEMPERATURE" />
       </frame>
       <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="13.0:0.6">
