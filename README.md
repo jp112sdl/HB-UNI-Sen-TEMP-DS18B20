@@ -16,6 +16,12 @@
 
 Um die Batterielebensdauer zu erhöhen, ist es unbedingt notwendig, die grüne LED vom Arduino Pro Mini mit einem kleinen Schraubendreher oder Messer von der Platine zu entfernen!
 
+## Universalplatine
+Wer eine eigene Platine herstellen möchte, kann auf eine Auswahl verschiedener vorgefertigter Layouts zurückgreifen.
+z.B.:
+- [PCB](https://github.com/alexreinert/PCB) von alexreinert
+- [HMSensor](https://github.com/pa-pa/HMSensor) von pa-pa
+
 ## Code flashen
 - [AskSinPP Library](https://github.com/pa-pa/AskSinPP) in der Arduino IDE installieren
   - Achtung: Die Lib benötigt selbst auch noch weitere Bibliotheken, siehe [README](https://github.com/pa-pa/AskSinPP#required-additional-arduino-libraries).
