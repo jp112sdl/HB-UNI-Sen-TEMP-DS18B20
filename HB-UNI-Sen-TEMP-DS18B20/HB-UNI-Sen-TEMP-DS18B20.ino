@@ -121,7 +121,7 @@ class WeatherChannel : public Channel<Hal, List1, EmptyList, List4, PEERS_PER_CH
     }
 };
 
-class UType : public MultiChannelDevice<Hal, WeatherChannel, 8, UList0> {
+class UType : public MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0> {
 
     class SensorArray : public Alarm {
         UType& dev;
