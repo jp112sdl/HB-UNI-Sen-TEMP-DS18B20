@@ -61,13 +61,13 @@
         </parameter>                                           
       </paramset>
     </channel>
-    <channel index="1" type="WEATHER" autoregister="true" count="8">
+    <channel index="1" type="WEATHER" autoregister="true" count="12">
       <link_roles>
         <source name="WEATHER_TH" />
       </link_roles>
        <paramset type="VALUES" id="HB-UNI-Sen-TEMP-DS18B20_values">
             <parameter id="TEMPERATURE" operations="read,event">
-               <logical type="float" min="-150.0" max="150.0" unit="°C" />
+               <logical type="float" min="-150.0" max="150.0" unit="Â°C" />
                <physical type="integer" interface="command" value_id="TEMPERATURE" no_init="true">
                   <event frame="MEASURE_EVENT" />
                </physical>
@@ -105,7 +105,19 @@
       <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="31.0:0.6">
          <parameter type="integer" signed="true" index="32.0" size="2.0" param="TEMPERATURE" />
       </frame>
-      <frame id="MEASURE_EV_BAT" direction="from_device" event="true" type="0x53" fixed_channel="*">
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="34.0:0.6">
+         <parameter type="integer" signed="true" index="35.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="37.0:0.6">
+         <parameter type="integer" signed="true" index="38.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="40.0:0.6">
+         <parameter type="integer" signed="true" index="41.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+      <frame id="MEASURE_EVENT" direction="from_device" event="true" type="0x53" channel_field="43.0:0.6">
+         <parameter type="integer" signed="true" index="44.0" size="2.0" param="TEMPERATURE" />
+      </frame>
+          <frame id="MEASURE_EV_BAT" direction="from_device" event="true" type="0x53" fixed_channel="*">
          <parameter type="integer" index="9.7" size="0.1" param="LOWBAT" />
       </frame>
   </frames>
