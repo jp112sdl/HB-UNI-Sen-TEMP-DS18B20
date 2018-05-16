@@ -1,5 +1,5 @@
 # HB-UNI-Sen-TEMP-DS18B20
-## Funk "Mehrfach Universal-Temperatursensor" für die Integration in HomeMatic
+## Funk "8fach Universal-Temperatursensor" für die Integration in HomeMatic
 
 ![wiring](Images/wiring.png)
 
@@ -11,7 +11,7 @@
 * 1x LED 
 * 1x Widerstand 330 Ohm
 * 1x Widerstand 4,7 kOhm
-* 1x ... 32x DS18B20 Temperatursensor(en)
+* 1x ... 8x DS18B20 Temperatursensor(en)
 * Draht, um die Komponenten zu verbinden
 
 Um die Batterielebensdauer zu erhöhen, ist es unbedingt notwendig, die grüne LED vom Arduino Pro Mini mit einem kleinen Schraubendreher oder Messer von der Platine zu entfernen!
@@ -28,8 +28,6 @@ z.B.:
 - [Projekt-Datei](https://raw.githubusercontent.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/master/HB-UNI-Sen-TEMP-DS18B20/HB-UNI-Sen-TEMP-DS18B20.ino) herunterladen.
 - Arduino IDE öffnen
   - Heruntergeladene Projekt-Datei öffnen
-  - Anpassungen entsprechend der gewünschten Sensoranzahl vornehmen
-    - siehe [#define MAX_SENSORS](https://github.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/blob/8f6b72a6af80073ad8ed982312ef0d6a5a369271/HB-UNI-Sen-TEMP-DS18B20/HB-UNI-Sen-TEMP-DS18B20.ino#L27)
   - Werkzeuge
     - Board: Arduino Pro or Pro Mini
     - Prozessor: ATmega328P (3.3V 8MHz) 
