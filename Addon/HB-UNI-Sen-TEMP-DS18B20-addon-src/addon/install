@@ -4,7 +4,7 @@ ADDON_NAME=hbunisentemp
 DEVICE="HB-UNI-Sen-TEMP-DS18B20"
 DEVICE_IMG=hb-uni-sen-temp-ds18b20.png
 DEVICE_THUMB=hb-uni-sen-temp-ds18b20_thumb.png
-DEVICE_DESC="Universal Mehrfach-Temperatursensor DS18B20"
+DEVICE_DESC="Universal 1..8x Temperatursensor DS18B20"
 
 mount -o remount,rw /
 
