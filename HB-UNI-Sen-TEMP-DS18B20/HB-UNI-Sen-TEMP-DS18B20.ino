@@ -1,7 +1,6 @@
 //- -----------------------------------------------------------------------------------------------------------------------
 // AskSin++
 // 2016-10-31 papa Creative Commons - http://creativecommons.org/licenses/by-nc-sa/3.0/de/
-// 2018-05-16 jp112sdl Creative Commons - http://creativecommons.org/licenses/by-nc-sa/3.0/de/
 //- -----------------------------------------------------------------------------------------------------------------------
 
 // define this to read the device id, serial and device type from bootloader section
@@ -17,22 +16,14 @@
 
 #include <OneWire.h>
 #include <sensors/Ds18b20.h>
+#define MAX_SENSORS       8
 
-// max. Anzahl Sensoren
-// - höchster Wert ist 32
-// - jeweils angefangene 4er Blöcke
-//   - bei 3 angeschlossenen  Sensoren: MAX_SENSORS 4
-//   - bei 9 angeschlossenen  Sensoren: MAX_SENSORS 12
-//   - bei 13 angeschlossenen Sensoren: MAX_SENSORS 16
-#define MAX_SENSORS       4
-
-#define LED_PIN           4
 // Arduino Pro mini 8 Mhz
 // Arduino pin for the config button
 #define CONFIG_BUTTON_PIN 8
 
 // number of available peers per channel
-#define PEERS_PER_CHANNEL 4
+#define PEERS_PER_CHANNEL 6
 
 //DS18B20 Sensors connected to pin
 OneWire oneWire(3);
@@ -43,14 +34,20 @@ using namespace as;
 // define all device properties
 const struct DeviceInfo PROGMEM devinfo = {
   {0xf3, 0x01, 0x01},          // Device ID
-  "UNITEMP001",               // Device Serial
+  "UNITEMP001",               // Device Serial 
   {0xF3, 0x01},              // Device Model
   0x10,                       // Firmware Version
   as::DeviceType::THSensor,   // Device Type
   {0x01, 0x01}               // Info Bytes
 };
 
-typedef AskSin<StatusLed<LED_PIN>, BatterySensor, Radio<AvrSPI<10, 11, 12, 13>, 2>> BaseHal;
+/**
+   Configure the used hardware
+*/
+typedef AvrSPI<10, 11, 12, 13> SPIType;
+typedef Radio<SPIType, 2> RadioType;
+typedef StatusLed<4> LedType;
+typedef AskSin<LedType, BatterySensor, RadioType> BaseHal;
 class Hal : public BaseHal {
   public:
     void init (const HMID& id) {
@@ -88,6 +85,9 @@ class UList0 : public RegList0<UReg0> {
 class WeatherEventMsg : public Message {
   public:
     void init(uint8_t msgcnt, Ds18b20* sensors, bool batlow, uint8_t channelFieldOffset) {
+      for (int i = 0; i < MAX_SENSORS; i++) {
+        DPRINT("T[");DDEC(i);DPRINT("]: ");DDECLN(sensors[i].temperature());
+      }
       Message::init(0x1a, msgcnt, 0x53, BCAST , batlow ? 0x80 : 0x00, 0x41 + channelFieldOffset);
       pload[0] = (sensors[0 + channelFieldOffset].temperature() >> 8) & 0xff;
       pload[1] = (sensors[0 + channelFieldOffset].temperature()) & 0xff;
@@ -136,20 +136,14 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0
           sysclock.add(*this);
 
           Ds18b20::measure(sensors, sensorcount);
-          for (int i = 0; i < MAX_SENSORS; i++) {
-            DPRINT("T[");
-            DDEC(i);
-            DPRINT("]: ");
-            DDECLN(sensors[i].temperature());
-          }
 
           WeatherEventMsg& msg = (WeatherEventMsg&)dev.message();
-
-          for (uint8_t i = 0; i < MAX_SENSORS >> 2; i++) {
-            msg.init(dev.nextcount(), sensors, dev.battery().low(), i * 4);
-            dev.send(msg, dev.getMasterID());
-            _delay_ms((MAX_SENSORS > 4) ? 200 : 0);
-          }
+          //Aufteilung in 2 Messages, da sonst die max. BidCos Message Size (0x1a)? überschritten wird
+          msg.init(dev.nextcount(), sensors, dev.battery().low(), 0);
+          dev.send(msg, dev.getMasterID());
+          _delay_ms(200);
+          msg.init(dev.nextcount(), sensors, dev.battery().low(), 4);
+          dev.send(msg, dev.getMasterID());
         }
 
         uint32_t delay () {
@@ -191,25 +185,10 @@ ConfigButton<UType> cfgBtn(sdev);
 
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
-  bool ok = true;
-  
-  if (MAX_SENSORS % 4 != 0) {
-    Serial.println(F("MAX_SENSORS is not a multiple of 4!"));
-    ok = false;
-  }
-
-  if (MAX_SENSORS == 0 || MAX_SENSORS > 32) {
-    Serial.println(F("MAX_SENSORS not in range [4...32]"));
-    ok = false;
-  }
-
-  if (ok) {
-    sdev.init(hal);
-    buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
-    sdev.initDone();
-  }
+  sdev.init(hal);
+  buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
+  sdev.initDone();
 }
-
 
 void loop() {
   bool worked = hal.runready();
