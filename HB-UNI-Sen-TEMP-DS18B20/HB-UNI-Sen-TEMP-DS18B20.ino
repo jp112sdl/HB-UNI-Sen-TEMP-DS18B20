@@ -85,7 +85,7 @@ class UList0 : public RegList0<UReg0> {
 class WeatherEventMsg : public Message {
   public:
     void init(uint8_t msgcnt, Ds18b20* sensors, bool batlow, uint8_t channelFieldOffset) {
-      Message::init(0x1a, msgcnt, 0x53, BCAST , batlow ? 0x80 : 0x00, 0x41 + channelFieldOffset);
+      Message::init(0x16, msgcnt, 0x53, BCAST , batlow ? 0x80 : 0x00, 0x41 + channelFieldOffset);
       pload[0] = (sensors[0 + channelFieldOffset].temperature() >> 8) & 0xff;
       pload[1] = (sensors[0 + channelFieldOffset].temperature()) & 0xff;
       pload[2] = 0x42 + channelFieldOffset;
