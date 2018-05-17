@@ -34,7 +34,7 @@ using namespace as;
 // define all device properties
 const struct DeviceInfo PROGMEM devinfo = {
   {0xf3, 0x01, 0x01},          // Device ID
-  "UNITEMP001",               // Device Serial 
+  "UNITEMP001",               // Device Serial
   {0xF3, 0x01},              // Device Model
   0x10,                       // Firmware Version
   as::DeviceType::THSensor,   // Device Type
@@ -85,9 +85,6 @@ class UList0 : public RegList0<UReg0> {
 class WeatherEventMsg : public Message {
   public:
     void init(uint8_t msgcnt, Ds18b20* sensors, bool batlow, uint8_t channelFieldOffset) {
-      for (int i = 0; i < MAX_SENSORS; i++) {
-        DPRINT("T[");DDEC(i);DPRINT("]: ");DDECLN(sensors[i].temperature());
-      }
       Message::init(0x1a, msgcnt, 0x53, BCAST , batlow ? 0x80 : 0x00, 0x41 + channelFieldOffset);
       pload[0] = (sensors[0 + channelFieldOffset].temperature() >> 8) & 0xff;
       pload[1] = (sensors[0 + channelFieldOffset].temperature()) & 0xff;
@@ -136,7 +133,11 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0
           sysclock.add(*this);
 
           Ds18b20::measure(sensors, sensorcount);
-
+          DPRINT(F("Temperaturen: | "));
+          for (int i = 0; i < MAX_SENSORS; i++) {
+            DDEC(sensors[i].temperature()); DPRINT(" | ");
+          }
+          DPRINTLN("");
           WeatherEventMsg& msg = (WeatherEventMsg&)dev.message();
           //Aufteilung in 2 Messages, da sonst die max. BidCos Message Size (0x1a)? überschritten wird
           msg.init(dev.nextcount(), sensors, dev.battery().low(), 0);
