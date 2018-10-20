@@ -10,7 +10,7 @@
 * 1x Taster (beliebig... irgendwas, das beim Draufdrücken schließt :smiley:)
 * 1x LED 
 * 1x Widerstand 330 Ohm
-* 1x Widerstand 4,7 kOhm
+* 1x Widerstand 2,2 kOhm
 * 1x ... 8x DS18B20 Temperatursensor(en)
 * Draht, um die Komponenten zu verbinden
 
