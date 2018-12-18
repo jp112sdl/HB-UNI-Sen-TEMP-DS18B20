@@ -14,6 +14,9 @@
 #include <Register.h>
 #include <MultiChannelDevice.h>
 
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x3f, 20, 4);
+
 #include <OneWire.h>
 #include <sensors/Ds18b20.h>
 #define MAX_SENSORS       8
@@ -137,6 +140,20 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0
           DPRINT(F("Temperaturen: | "));
           for (int i = 0; i < MAX_SENSORS; i++) {
             DDEC(sensors[i].temperature()); DPRINT(" | ");
+
+            uint8_t x = (i % 2 == 0 ? 0 : 10);
+            uint8_t y = i / 2;
+            lcd.setCursor(x, y);
+
+            String s_temp = " --.-";
+            if ((i + 1) <= sensorcount) {
+              s_temp = (String)((float)sensors[i].temperature() / 10.0);
+              s_temp = s_temp.substring(0, s_temp.length() - 1);
+              if (sensors[i].temperature() < 1000 && sensors[i].temperature() >= 0) s_temp = " " + s_temp;
+            }
+            String disp_temp = String(i + 1) + ":" + s_temp + (char)223 + "C";
+            
+            lcd.print(disp_temp);
           }
           DPRINTLN("");
           WeatherEventMsg& msg = (WeatherEventMsg&)dev.message();
@@ -187,6 +204,8 @@ ConfigButton<UType> cfgBtn(sdev);
 
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
+  lcd.init();
+  lcd.backlight();
   sdev.init(hal);
   buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
   sdev.initDone();
