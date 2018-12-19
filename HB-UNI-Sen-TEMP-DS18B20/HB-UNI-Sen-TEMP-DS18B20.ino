@@ -6,6 +6,9 @@
 // define this to read the device id, serial and device type from bootloader section
 // #define USE_OTA_BOOTLOADER
 
+//#define USE_LCD
+//#define LCD_ADDRESS 0x3f
+
 #define EI_NOTEXTERNAL
 #include <EnableInterrupt.h>
 #include <AskSinPP.h>
@@ -14,8 +17,10 @@
 #include <Register.h>
 #include <MultiChannelDevice.h>
 
+#ifdef USE_LCD
 #include <LiquidCrystal_I2C.h>
-LiquidCrystal_I2C lcd(0x3f, 20, 4);
+LiquidCrystal_I2C lcd(LCD_ADDRESS, 20, 4);
+#endif
 
 #include <OneWire.h>
 #include <sensors/Ds18b20.h>
@@ -140,7 +145,7 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0
           DPRINT(F("Temperaturen: | "));
           for (int i = 0; i < MAX_SENSORS; i++) {
             DDEC(sensors[i].temperature()); DPRINT(" | ");
-
+#ifdef USE_LCD
             uint8_t x = (i % 2 == 0 ? 0 : 10);
             uint8_t y = i / 2;
             lcd.setCursor(x, y);
@@ -151,9 +156,10 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0
               s_temp = s_temp.substring(0, s_temp.length() - 1);
               if (sensors[i].temperature() < 1000 && sensors[i].temperature() >= 0) s_temp = " " + s_temp;
             }
-            String disp_temp = String(i + 1) + ":" + s_temp + (char)223 + "C";
-            
+            String disp_temp = String(i + 1) + ":" + s_temp + (char)223 + "C ";
+
             lcd.print(disp_temp);
+#endif
           }
           DPRINTLN("");
           WeatherEventMsg& msg = (WeatherEventMsg&)dev.message();
@@ -194,6 +200,10 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0
       TSDevice::init(hal);
       sensarray.sensorcount = Ds18b20::init(oneWire, sensarray.sensors, MAX_SENSORS);
       DPRINT("Found "); DDEC(sensarray.sensorcount); DPRINTLN(" DS18B20 Sensors");
+#ifdef USE_LCD
+      lcd.setCursor(2, 3);
+      lcd.print("Found Sensors: " + String(sensarray.sensorcount));
+#endif
       sensarray.set(seconds2ticks(5));
       sysclock.add(sensarray);
     }
@@ -204,8 +214,21 @@ ConfigButton<UType> cfgBtn(sdev);
 
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
+  DDEVINFO(sdev);
+
+#ifdef USE_LCD
   lcd.init();
   lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("UNI-Sen-TEMP-DS18B20");
+  lcd.setCursor(5, 1);
+  lcd.print((char*)serial);
+  HMID temp;
+  sdev.getDeviceID(temp);
+  lcd.setCursor(7, 2);
+  lcd.print(temp, HEX);
+#endif
+
   sdev.init(hal);
   buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
   sdev.initDone();
