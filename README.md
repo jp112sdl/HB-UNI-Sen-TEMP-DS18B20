@@ -59,4 +59,17 @@ Unter "Status und Bedienung" -> "Geräte" können die einzelnen Werte angezeigt 
 Eine Verwendung in Programmen ist ebenfalls möglich.
 
 
+## LCD Display
+Unterstützung von LCD 4x20 Zeichen LCD I2C Displays.<br>
+Der Anschluss erfolgt über die Hardware-I2C Pins des Pro Mini (SDA=A4, SCL=A5).<br>
+Im Sketch sind bei den Zeilen<br>
+```
+//#define USE_LCD
+//#define LCD_ADDRESS 0x3f
+```
+die Kommentarzeichen `//` zu entfernen, sowie die `LCD_ADRESS` entsprechend anzupassen.
+<br><br>
 
+<img src=Images/LCD_Startscreen.jpeg width=400 />
+<br>
+<img src=Images/LCD_Tempscreen.jpeg width=400 />
