@@ -167,9 +167,11 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0
           //Aufteilung in 2 Messages, da sonst die max. BidCos Message Size (0x1a)? überschritten wird
           msg.init(dev.nextcount(), sensors, dev.battery().low(), 0);
           dev.send(msg, dev.getMasterID());
-          _delay_ms(200);
+#if MAX_SENSORS > 4
+          _delay_ms(250);
           msg.init(dev.nextcount(), sensors, dev.battery().low(), 4);
           dev.send(msg, dev.getMasterID());
+#endif
         }
 
         uint32_t delay () {
