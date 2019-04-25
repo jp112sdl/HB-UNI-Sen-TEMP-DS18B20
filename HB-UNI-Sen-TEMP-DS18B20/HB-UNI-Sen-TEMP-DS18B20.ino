@@ -92,31 +92,69 @@ class UList0 : public RegList0<UReg0> {
     }
 };
 
-class WeatherEventMsg : public Message {
+DEFREGISTER(UReg1, 0x01, 0x02, 0x03, 0x04)
+class UList1 : public RegList1<UReg1> {
   public:
-    void init(uint8_t msgcnt, Ds18b20* sensors, bool batlow, uint8_t channelFieldOffset) {
-      Message::init(0x16, msgcnt, 0x53, BCAST , batlow ? 0x80 : 0x00, 0x41 + channelFieldOffset);
-      pload[0] = (sensors[0 + channelFieldOffset].temperature() >> 8) & 0xff;
-      pload[1] = (sensors[0 + channelFieldOffset].temperature()) & 0xff;
-      pload[2] = 0x42 + channelFieldOffset;
-      pload[3] = (sensors[1 + channelFieldOffset].temperature() >> 8) & 0xff;
-      pload[4] = (sensors[1 + channelFieldOffset].temperature()) & 0xff;
-      pload[5] = 0x43 + channelFieldOffset;
-      pload[6] = (sensors[2 + channelFieldOffset].temperature() >> 8) & 0xff;
-      pload[7] = (sensors[2 + channelFieldOffset].temperature()) & 0xff;
-      pload[8] = 0x44 + channelFieldOffset;
-      pload[9] = (sensors[3 + channelFieldOffset].temperature() >> 8) & 0xff;
-      pload[10] = (sensors[3 + channelFieldOffset].temperature()) & 0xff;
+    UList1 (uint16_t addr) : RegList1<UReg1>(addr) {}
+
+    bool Offset (int32_t value) const {
+      return
+          this->writeRegister(0x01, (value >> 24) & 0xff) &&
+          this->writeRegister(0x02, (value >> 16) & 0xff) &&
+          this->writeRegister(0x03, (value >> 8) & 0xff) &&
+          this->writeRegister(0x04, (value) & 0xff)
+          ;
+    }
+
+    int32_t Offset () const {
+      return
+          ((int32_t)(this->readRegister(0x01, 0)) << 24) +
+          ((int32_t)(this->readRegister(0x02, 0)) << 16) +
+          ((int32_t)(this->readRegister(0x03, 0)) << 8) +
+          ((int32_t)(this->readRegister(0x04, 0)))
+          ;
+    }
+    void defaults () {
+      clear();
+      Offset(0);
     }
 };
 
-class WeatherChannel : public Channel<Hal, List1, EmptyList, List4, PEERS_PER_CHANNEL, UList0> {
+int32_t Offsets[MAX_SENSORS];
+
+
+class WeatherEventMsg : public Message {
+  public:
+    void init(uint8_t msgcnt, Ds18b20* sensors, bool batlow, uint8_t channelFieldOffset) {
+      Message::init(0x16, msgcnt, 0x53, (msgcnt % 20 == 1) ? BIDI : BCAST, batlow ? 0x80 : 0x00, 0x41 + channelFieldOffset);
+      int16_t t0 = sensors[0 + channelFieldOffset].temperature() + Offsets[0 + channelFieldOffset];
+      int16_t t1 = sensors[1 + channelFieldOffset].temperature() + Offsets[1 + channelFieldOffset];
+      int16_t t2 = sensors[2 + channelFieldOffset].temperature() + Offsets[2 + channelFieldOffset];
+      int16_t t3 = sensors[3 + channelFieldOffset].temperature() + Offsets[3 + channelFieldOffset];
+
+      pload[0] = (t0 >> 8) & 0xff;
+      pload[1] = (t0) & 0xff;
+      pload[2] = 0x42 + channelFieldOffset;
+      pload[3] = (t1 >> 8) & 0xff;
+      pload[4] = (t1) & 0xff;
+      pload[5] = 0x43 + channelFieldOffset;
+      pload[6] = (t2 >> 8) & 0xff;
+      pload[7] = (t2) & 0xff;
+      pload[8] = 0x44 + channelFieldOffset;
+      pload[9] = (t3 >> 8) & 0xff;
+      pload[10] = (t3) & 0xff;
+    }
+};
+
+class WeatherChannel : public Channel<Hal, UList1, EmptyList, List4, PEERS_PER_CHANNEL, UList0> {
   public:
     WeatherChannel () : Channel() {}
     virtual ~WeatherChannel () {}
 
     void configChanged() {
-      //DPRINTLN("Config changed List1");
+      //DPRINT(F("(")); DDEC(number()); DPRINTLN(F(") Config changed List1"));
+      DPRINT(F("OFFSET: ")); DDECLN(this->getList1().Offset());
+      Offsets[number() - 1] = this->getList1().Offset();
     }
 
     uint8_t status () const {
@@ -217,6 +255,7 @@ ConfigButton<UType> cfgBtn(sdev);
 
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
+  memset(Offsets, 0, MAX_SENSORS);
   DDEVINFO(sdev);
 
 #ifdef USE_LCD
