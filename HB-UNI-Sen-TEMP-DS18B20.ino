@@ -174,7 +174,7 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0
       public:
         uint8_t       sensorcount;
         Ds18b20       sensors[MAX_SENSORS];
-        SensorArray (UType& d) : Alarm(0), dev(d) {}
+        SensorArray (UType& d) : Alarm(0), dev(d), sensorcount(0) {}
 
         virtual void trigger (__attribute__ ((unused)) AlarmClock& clock) {
           tick = delay();
@@ -237,7 +237,7 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0
       DPRINT("Sendeintervall: "); DDECLN(this->getList0().Sendeintervall());
     }
 
-    bool init (Hal& hal) {
+    void init (Hal& hal) {
       TSDevice::init(hal);
       sensarray.sensorcount = Ds18b20::init(oneWire, sensarray.sensors, MAX_SENSORS);
       DPRINT("Found "); DDEC(sensarray.sensorcount); DPRINTLN(" DS18B20 Sensors");
