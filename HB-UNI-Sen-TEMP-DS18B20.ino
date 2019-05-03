@@ -86,7 +86,6 @@ class UList0 : public RegList0<UReg0> {
     }
     void defaults () {
       clear();
-      burstRx(false);
       lowBatLimit(22);
       Sendeintervall(180);
     }
@@ -231,8 +230,6 @@ class UType : public MultiChannelDevice<Hal, WeatherChannel, MAX_SENSORS, UList0
       DPRINTLN("Config Changed List0");
       DPRINT("LOW BAT Limit: ");
       DDECLN(this->getList0().lowBatLimit());
-      DPRINT("Wake-On-Radio: ");
-      DDECLN(this->getList0().burstRx());
       this->battery().low(this->getList0().lowBatLimit());
       DPRINT("Sendeintervall: "); DDECLN(this->getList0().Sendeintervall());
     }
