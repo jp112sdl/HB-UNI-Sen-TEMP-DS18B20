@@ -125,7 +125,7 @@ int32_t Offsets[MAX_SENSORS];
 class WeatherEventMsg : public Message {
   public:
     void init(uint8_t msgcnt, Ds18b20* sensors, bool batlow, uint8_t channelFieldOffset) {
-      Message::init(0x16, msgcnt, 0x53, (msgcnt % 20 == 1) ? BIDI : BCAST, batlow ? 0x80 : 0x00, 0x41 + channelFieldOffset);
+      Message::init(0x16, msgcnt, 0x53, (msgcnt % 20 == 1) ? (BIDI | WKMEUP) : BCAST, batlow ? 0x80 : 0x00, 0x41 + channelFieldOffset);
       int16_t t0 = sensors[0 + channelFieldOffset].temperature() + Offsets[0 + channelFieldOffset];
       int16_t t1 = sensors[1 + channelFieldOffset].temperature() + Offsets[1 + channelFieldOffset];
       int16_t t2 = sensors[2 + channelFieldOffset].temperature() + Offsets[2 + channelFieldOffset];
