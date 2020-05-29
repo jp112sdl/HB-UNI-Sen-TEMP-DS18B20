@@ -25,7 +25,7 @@ z.B.:
 ## Code flashen
 - [AskSinPP Library](https://github.com/pa-pa/AskSinPP) in der Arduino IDE installieren
   - Achtung: Die Lib benötigt selbst auch noch weitere Bibliotheken, siehe [README](https://github.com/pa-pa/AskSinPP#required-additional-arduino-libraries).
-- [Projekt-Datei](https://raw.githubusercontent.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/master/HB-UNI-Sen-TEMP-DS18B20/HB-UNI-Sen-TEMP-DS18B20.ino) herunterladen.
+- [Projekt-Datei](https://raw.githubusercontent.com/jp112sdl/HB-UNI-Sen-TEMP-DS18B20/master/HB-UNI-Sen-TEMP-DS18B20.ino) herunterladen.
 - Arduino IDE öffnen
   - Heruntergeladene Projekt-Datei öffnen
   - Werkzeuge
