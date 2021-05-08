@@ -19,6 +19,7 @@
 #include <MultiChannelDevice.h>
 
 #ifdef USE_LCD
+//use this LCD lib: https://github.com/marcoschwartz/LiquidCrystal_I2C
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(LCD_ADDRESS, 20, 4);
 #endif
