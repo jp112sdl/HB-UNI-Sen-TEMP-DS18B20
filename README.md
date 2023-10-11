@@ -17,7 +17,7 @@
 * Draht, um die Komponenten zu verbinden
 * 1x 5V-Netzteil oder Batterie mit Halter
 
-Für Batteriebetrieb: Um die Batterielebensdauer zu erhöhen, ist es unbedingt notwendig, die grüne LED sowie den LDO vom Arduino Pro Mini (die 2 roten X auf dem Schaltplan) abzulöten, oder mit einem kleinen Schraubendreher oder Messer von der Platine zu entfernen. Unbedingt aufpassen, dass keine Leiterbahnen zerstört werden.
+Für Batteriebetrieb: Um die Batterielebensdauer zu erhöhen, ist es unbedingt notwendig, die grüne LED sowie den LDO vom Arduino Pro Mini (die 2 roten X auf dem Schaltplan) (oder deren Vorwiderstand) abzulöten, oder mit einem kleinen Schraubendreher oder Messer von der Platine zu entfernen. Unbedingt aufpassen, dass keine Leiterbahnen zerstört werden.
 
 Die Funkmodule sind immer für 3,3V-Betrieb ausgelegt. Daher wird auch ein 3,3V-Arduino verwendet. Die LCD-Module sind für 5V ausgelegt und auch das hier verwendete I2C-Interface PCF8574 wird mit 5V betrieben. Und dieses benötigt gemäß Spezifikation als High-Level von SDA und SCL mindestens 0,7 * VDD = 0,7 * 5V = 3,5V. Ohne einen Pegelwandler könnte es insbesondere bei auf z.B. 4,5V abgesenkter LCD-Betriebsspannung auch ohne I²C-Pegelwandler funktionieren. Für einen sichere Betrieb ist so ein Pegelwanlder aber sehr zu empfehlen. Z.B. [PCA9517 Breakout](https://www.google.com/search?q=pca9517+breakout)
 
