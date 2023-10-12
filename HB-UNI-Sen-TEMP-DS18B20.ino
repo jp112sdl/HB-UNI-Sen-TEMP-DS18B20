@@ -38,9 +38,12 @@ const uint64_t SENSOR_ORDER[] = {}; // Leer: Alle Sensoren in der gefundenen Rei
 // #define USE_WOR // activate if operated from battery to save power (without always receiving packets)
 #define HIDE_IGNORE_MSG // without USE_WOR the serial monitor shows messages for other devices, which are suppressed by this
 
-#define USE_LCD // Operation with an 20x4 LCD display
-#define WITH_BACKLIGHT // use an additional button to switch off/on LCD backlight and to display OneWire serial numbers
-#define LCD_ADDRESS 0x27 //0x27 = alle 3 Brücken offen
+// #define USE_LCD // Operation with an 20x4 LCD display
+
+#ifdef USE_LCD
+  #define WITH_BACKLIGHT // use an additional button to switch off/on LCD backlight and to display OneWire serial numbers
+  #define LCD_ADDRESS 0x27 //0x27 = alle 3 Brücken offen
+#endif
 
 #define DEFAULT_SENDE_INTERVALL_s 60
 #define ELDER_N 10 // bei <=3 Sensoren, älter Werte von vor 1 .. 2 * (ELDER_N *  dev.getList0().Sendeintervall()) Sekunden im LCD anzeigen
