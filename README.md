@@ -1,7 +1,12 @@
 # HB-UNI-Sen-TEMP-DS18B20
 ## Funk "8fach Universal-Temperatursensor" für die Integration in HomeMatic
 
+Einfache Variante ohne LCD Display
 ![wiring](Images/wiring.png)
+<br>
+Variante mit LCD Display
+![wiring](Images/wiringLCD.png)
+
 
 ## Benötigte Hardware
 * 1x Arduino Pro Mini **ATmega328P (3.3V / 8MHz)**
