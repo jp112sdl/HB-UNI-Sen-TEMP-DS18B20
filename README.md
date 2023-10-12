@@ -1,10 +1,10 @@
 # HB-UNI-Sen-TEMP-DS18B20
 ## Funk "8fach Universal-Temperatursensor" für die Integration in HomeMatic
 
-Einfache Variante ohne LCD Display
+Einfache Variante ohne LCD Display:
 ![wiring](Images/wiring.png)
-<br>
-Variante mit LCD Display
+<br><br>
+Variante mit LCD Display:
 ![wiring](Images/wiringLCD.png)
 
 
